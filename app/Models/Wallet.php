@@ -21,4 +21,14 @@ class Wallet extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function updateBalance($amount, $type)
+    {
+        if ($type === 'income') {
+            $this->balance += $amount;
+        } else {
+            $this->balance -= $amount;
+        }
+        $this->save();
+    }
 }

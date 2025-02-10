@@ -16,7 +16,7 @@ class Transaction extends Model
         'type',
         'amount',
         'date',
-        'category',
+        'category_id',
         'source',
         'note'
     ];
@@ -35,14 +35,28 @@ class Transaction extends Model
         return $this->belongsTo(Wallet::class);
     }
 
-    protected static function booted()
+    public function category()
     {
+        return $this->belongsTo(Category::class);
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
         static::created(function ($transaction) {
-            $transaction->wallet->updateBalance();
+            $wallet = $transaction->wallet;
+            $wallet->updateBalance($transaction->amount, $transaction->type);
+        });
+
+        static::updated(function ($transaction) {
+            $wallet = $transaction->wallet;
+            $wallet->updateBalance($transaction->amount, $transaction->type);
         });
 
         static::deleted(function ($transaction) {
-            $transaction->wallet->updateBalance();
+            $wallet = $transaction->wallet;
+            $wallet->updateBalance(-$transaction->amount, $transaction->type);
         });
     }
 }

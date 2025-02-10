@@ -22,4 +22,9 @@ class Category extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }

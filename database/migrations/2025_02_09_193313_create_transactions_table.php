@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transections', function (Blueprint $table) {
+        Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('wallet_id')->constrained();
+            $table->string('category_id')->nullable();
             $table->string('type'); // income, expense
             $table->decimal('amount', 12, 2);
             $table->date('date');
-            $table->string('category')->nullable();
+
             $table->string('source')->nullable(); // For income: salary, business, etc.
             $table->text('note')->nullable();
             $table->timestamps();
@@ -34,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transections');
+        Schema::dropIfExists('transactions');
     }
 };
