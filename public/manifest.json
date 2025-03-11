@@ -1,6 +1,6 @@
 {
-    "name": "Personal Finance Tracker",
-    "short_name": "FinanceApp",
+    "name": "Hisab Nikash",
+    "short_name": "HisabNikash",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
