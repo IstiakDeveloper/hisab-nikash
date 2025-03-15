@@ -12,7 +12,7 @@ class Transaction extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $fillable = [
         'user_id',
@@ -27,41 +27,12 @@ class Transaction extends Model
     /**
      * The attributes that should be cast.
      *
-     * @var array<string, string>
+     * @var array
      */
     protected $casts = [
         'amount' => 'decimal:2',
         'date' => 'date',
     ];
-
-    /**
-     * The "booted" method of the model.
-     *
-     * @return void
-     */
-    protected static function booted()
-    {
-        static::created(function ($transaction) {
-            $transaction->account->updateBalance($transaction);
-        });
-
-        static::updated(function ($transaction) {
-            // This is simplified. In a real app, you'd need to calculate the difference
-            // between original and updated values and adjust balance accordingly
-            $transaction->account->updateBalance($transaction);
-        });
-
-        static::deleted(function ($transaction) {
-            // Reverse the transaction effect when deleted
-            if ($transaction->type == 'income') {
-                $transaction->account->balance -= $transaction->amount;
-            } elseif ($transaction->type == 'expense') {
-                $transaction->account->balance += $transaction->amount;
-            }
-
-            $transaction->account->save();
-        });
-    }
 
     /**
      * Get the user that owns the transaction.
@@ -85,5 +56,73 @@ class Transaction extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Scope a query to only include transactions of a specific type.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOfType($query, $type)
+    {
+        return $query->where('type', $type);
+    }
+
+    /**
+     * Scope a query to only include transactions for a date range.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $startDate
+     * @param  string  $endDate
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeDateBetween($query, $startDate, $endDate)
+    {
+        return $query->whereBetween('date', [$startDate, $endDate]);
+    }
+
+    /**
+     * Scope a query to only include income transactions.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeIncome($query)
+    {
+        return $query->where('type', 'income');
+    }
+
+    /**
+     * Scope a query to only include expense transactions.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeExpense($query)
+    {
+        return $query->where('type', 'expense');
+    }
+
+    /**
+     * Scope a query to only include transfer transactions.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeTransfer($query)
+    {
+        return $query->where('type', 'transfer');
+    }
+
+    /**
+     * Get formatted amount with currency symbol.
+     *
+     * @return string
+     */
+    public function getFormattedAmountAttribute()
+    {
+        return number_format($this->amount, 2);
     }
 }

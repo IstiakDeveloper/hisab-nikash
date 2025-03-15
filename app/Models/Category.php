@@ -12,7 +12,7 @@ class Category extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $fillable = [
         'user_id',
@@ -36,13 +36,5 @@ class Category extends Model
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
-    }
-
-    /**
-     * Get total amount spent in this category.
-     */
-    public function getTotalAmountAttribute()
-    {
-        return $this->transactions()->sum('amount');
     }
 }

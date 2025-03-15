@@ -12,7 +12,7 @@ class Account extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $fillable = [
         'user_id',
@@ -25,7 +25,7 @@ class Account extends Model
     /**
      * The attributes that should be cast.
      *
-     * @var array<string, string>
+     * @var array
      */
     protected $casts = [
         'balance' => 'decimal:2',
@@ -45,22 +45,5 @@ class Account extends Model
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
-    }
-
-    /**
-     * Update the account balance based on a transaction.
-     *
-     * @param Transaction $transaction
-     * @return void
-     */
-    public function updateBalance(Transaction $transaction)
-    {
-        if ($transaction->type == 'income') {
-            $this->balance += $transaction->amount;
-        } elseif ($transaction->type == 'expense') {
-            $this->balance -= $transaction->amount;
-        }
-
-        $this->save();
     }
 }
